@@ -21,9 +21,29 @@ message LoginReply {
 }
 
 message ChatSendRequest {
-	string name = 1;
-	string token = 2;
-	string text = 3;
+
+	message NormalMessage {
+		string name = 1;
+		string token = 2;
+		string text = 3;
+	}
+	
+	message RevokeMessage {
+		string token = 1;
+		enum revoketype {
+			alter = 1;
+			remove = 2;
+		}
+		revoketype type = 2;
+		string target_uuid = 3;
+		string text = 4;
+	}
+	
+	oneof chat_message {
+		NormalMessage normal_message = 1;
+		RevokeMessage revoke_message = 2;
+	}
+	
 }
 
 message ChatSendReply {
@@ -42,8 +62,25 @@ message ChatMessage {
 	uint64 unix_time = 4;
 }
 
+message ChatRevokeMessage {
+	string id = 1;
+	string sender = 2;
+	string text = 3;
+	uint64 unix_time = 4;
+	string target_id = 5;
+	enum revoketype {
+		alter = 1;
+		remove = 2;
+	}
+	revoketype type = 6;
+}
+
 message NotifyChatMessageRequest {
-	ChatMessage chat_message = 1;
+	oneof req_message  {
+		ChatMessage chat_message = 1;
+		ChatRevokeMessage chat_revoke_message = 2;
+	}
+	
 }
 
 message NotifyChatMessageReply {
